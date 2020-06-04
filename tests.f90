@@ -56,11 +56,9 @@ module tests
             end do 
         end function new_testset
 
-        function four_equals_four() result(test_result)
-            logical:: test_result
-            test_result = ((2 + 2) == 4)
-        end function four_equals_four
-
+        ! TODO: some sort of asset function that will print exactly what failed and 
+        ! what the passed values were
+        !
         !function assert_eq(arg1, arg2) result(equals)
         !   logical::equals
         !    equals = (arg1 == arg2)
@@ -70,16 +68,6 @@ module tests
         !    logical::not_equals
         !    not_equals = (arg1 .ne. arg2)
         !end function assert_neq
-
-        function true() result(trueval)
-            logical:: trueval
-            trueval = .true.
-        end function true
-        
-        function false() result(falseval)
-            logical::falseval
-            falseval = .false.
-        end function false
 
         subroutine run_test(my_test)
             type(Test), intent(inout):: my_test
