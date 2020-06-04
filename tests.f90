@@ -61,6 +61,16 @@ module tests
             test_result = ((2 + 2) == 4)
         end function four_equals_four
 
+        !function assert_eq(arg1, arg2) result(equals)
+        !   logical::equals
+        !    equals = (arg1 == arg2)
+        !end function assert_eq
+
+        !function assert_neq(arg1, arg2) result(not_equals)
+        !    logical::not_equals
+        !    not_equals = (arg1 .ne. arg2)
+        !end function assert_neq
+
         function true() result(trueval)
             logical:: trueval
             trueval = .true.
