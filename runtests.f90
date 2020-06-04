@@ -11,54 +11,21 @@ program runtests
 
     testset_1 = new_testset(            &
         (/                              &
-            new_test(                   &
-                true(),                   &
-                "True test"             &
-            ),                          &
-            new_test(                   &
-                false(),                &
-                "False test"            &
-            ),                          &
-            new_test(                   &
-                four_equals_four(),       &   
-                "2 + 2 = 4"             &
-            )                           &
+            assert(.true.),             &               
+            assert_eq(2+2, 4),           &
+            assert_approx(4.0d0, 4.0d0 + sqrt(epsilon(4.0d0))) &
         /),                             &
         "My testset"                    &  
     )
 
     testset_2 = new_testset(            &
         (/                              &
-            new_test(                   &
-                true(),                 &
-                "True test"             &
-            ),                          &
-            new_test(                   &
-                four_equals_four(),     &   
-                "2 + 2 = 4"             &
-            ),                          &
-            new_test(                   &
-                false()                 &
-            ),                           &
-            new_test(                   &
-                assert_neq(2 + 2, 4)                &
-            )                           &
+            assert(.true.),              &
+            assert_neq(2+2, 4)          &
         /),                             &
         "2nd testset"                   & 
     )                                   
 
     tests = (/ testset_1, testset_2/)
     call print_all_test_results(tests)
-
-    !my_result = assert_neq(2 + 2, 4)
-    !print*, my_result%result_msg
-
-    !my_result = assert_neq(2. + 2., 4.)
-    !print*, my_result%result_msg
-
-    !my_result = assert_neq(2.0d0 + 2.0d0, 4.0d0)
-    !print*, my_result%result_msg
-
-    !my_result = assert_approx(2.0d0 + 2.0d0, 4.0d0 + sqrt(EPSILON(4.0d0)))
-    !print*, my_result%result_msg
 end program

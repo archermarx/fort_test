@@ -1,21 +1,16 @@
-!TODO:  1. Allow running of tests to be deferred/ignored
-!       2. Merge test and result type into new Test type
-!       3. Make naming test sets optional
+!TODO:  1.  Allow running of tests to be deferred/ignored       
+!       2.  Make naming test sets optional
 
 module fort_test
+    
     type Result
-        character(len = :), allocatable:: result_msg
+        character(len = :), allocatable:: assertion
         logical:: passed
-    end type
-
-    type Test
-        character(len = :), allocatable:: name
-        type(Result):: result
     end type
 
     type TestSet
         character(len = 16):: name
-        type(Test), dimension(:), allocatable:: test_list
+        type(Result), dimension(:), allocatable:: test_list
         integer:: num_passed, num_failed
     end type
 
@@ -32,26 +27,10 @@ module fort_test
     end interface assert_approx
 
     contains
-        function new_test(test_result, test_name) result(my_test)
-            type(Test):: my_test
-            character(len = *), optional:: test_name
-            character(:), allocatable :: name
-            type(Result)::test_result
-
-            if (present(test_name)) then
-                name = test_name
-            else
-                name = "noname"
-            endif
-
-            my_test%name = name
-            my_test%result = test_result
-        end function new_test
-
         function new_testset(test_list, name) result(my_testset)
             type(TestSet):: my_testset
             character(len = *), intent(in):: name
-            type(Test), dimension(:), intent(in):: test_list
+            type(Result), dimension(:), intent(in):: test_list
 
             my_testset%name = name
             my_testset%test_list = test_list
@@ -62,7 +41,7 @@ module fort_test
 
             ! TODO: Move this into testset constructor
             do i = 1, num_tests
-                if (my_testset%test_list(i)%result%passed) then
+                if (my_testset%test_list(i)%passed) then
                     my_testset%num_passed = my_testset%num_passed + 1
                 else
                     my_testset%num_failed = my_testset%num_failed + 1
@@ -73,16 +52,13 @@ module fort_test
         function assert(bool) result(my_result)
             logical, intent(in):: bool
             type(Result):: my_result
-            character(len = :), allocatable:: assertion, result_msg
 
             if (bool) then
-                assertion = "true"
+                my_result%assertion = "true"
             else
-                assertion = "false"
+                my_result%assertion = "false"
             endif
 
-            result_msg = assertion_result_msg(assertion, bool)
-            my_result%result_msg = result_msg
             my_result%passed = bool
         end function assert
 
@@ -200,53 +176,31 @@ module fort_test
         
         function build_assertion(arg1_str, arg2_str, passed, comparision) result(my_result)
             character(len = *):: arg1_str, arg2_str, comparision
-            character(len = :), allocatable:: assertion, result_msg
             type(Result):: my_result
             logical:: passed
 
-            assertion = trim(adjustl(arg1_str))//" "//comparision//" "//trim(adjustl(arg2_str))
-
-            result_msg = assertion_result_msg(assertion, passed)
-            my_result%result_msg = result_msg
+            my_result%assertion = trim(adjustl(arg1_str))//" "//comparision//" "//trim(adjustl(arg2_str))
             my_result%passed = passed
         end function build_assertion
 
-        function assertion_result_msg(assertion, passed) result(result_msg)
-            character(:), allocatable, intent(in):: assertion
-            character(:), allocatable:: result_msg
-            logical, intent(in):: passed
-
-            if (passed) then
-                result_msg = '      Assertion "'//assertion//'" satisfied'
-            else
-                result_msg = '      Assertion "'//assertion//'" not satisfied'
-            endif
-
-        end function assertion_result_msg
-
-        subroutine test_result_msg(my_test, test_number)
-            type(Test), intent(in)::my_test
+        subroutine print_result_msg(my_result, test_number)
+            type(Result), intent(in)::my_result
             integer, intent(in):: test_number
             character(len = :), allocatable:: output_string, test_name_string
             character(len = 2):: test_number_string
 
             write(test_number_string, '(I2)') test_number
+            test_name_string = '   Test '//test_number_string
 
-            if (my_test%name == "noname") then
-                test_name_string = '   Test '//test_number_string
-            else
-                test_name_string = '   Test '//test_number_string//': "'//my_test%name//'"'
-            endif
-
-            if (my_test%result%passed) then
+            if (my_result%passed) then
                 output_string = test_name_string//" passed."
             else
                 output_string = achar(27)//'[31m'//test_name_string//' failed.'//achar(27)//'[0m'//NEW_LINE('A')// &
-                                "       "//my_test%result%result_msg
+                                "       "//'      Assertion "'//my_result%assertion//'" not satisfied'
             endif
 
             print *, output_string
-        end subroutine test_result_msg
+        end subroutine print_result_msg
 
         subroutine print_testset_results(my_testset)
             character(len = 8):: num_passed_string, num_failed_string, total_string
@@ -264,7 +218,7 @@ module fort_test
                      achar(27)//'[96m'//adjustr(total_string)//achar(27)//'[0m'
                 num_tests = size(my_testset%test_list)
                 do i = 1, num_tests
-                    call test_result_msg(my_testset%test_list(i), i)
+                    call print_result_msg(my_testset%test_list(i), i)
                 end do 
             else
                 print *, my_testset%name//'|'//& 
@@ -273,8 +227,6 @@ module fort_test
                      achar(27)//'[96m'//adjustr(total_string)//achar(27)//'[0m'
             endif
 
-            ! TODO: if any are fails, then print all tests in set
-            ! TODO: better alignment using tab characters??? or fixed length characters????
         end subroutine print_testset_results
 
         subroutine print_all_test_results(testsets)
