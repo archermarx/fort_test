@@ -1,5 +1,8 @@
-module fort_test
+!TODO:  1. Allow running of tests to be deferred/ignored
+!       2. Merge test and result type into new Test type
+!       3. Make naming test sets optional
 
+module fort_test
     type Result
         character(len = :), allocatable:: result_msg
         logical:: passed
@@ -16,13 +19,6 @@ module fort_test
         integer:: num_passed, num_failed
     end type
 
-    interface
-        function testinterface()
-            import:: Result
-            type(Result)::testinterface
-        end function testinterface
-    end interface
-
     interface assert_eq
         procedure z_assert_eq, s_assert_eq, d_assert_eq
     end interface assert_eq
@@ -36,7 +32,6 @@ module fort_test
     end interface assert_approx
 
     contains
-
         function new_test(test_result, test_name) result(my_test)
             type(Test):: my_test
             character(len = *), optional:: test_name
@@ -228,25 +223,6 @@ module fort_test
             endif
 
         end function assertion_result_msg
-
-        !function assert_neq(arg1, arg2) result(not_equals)
-        !    logical::not_equals
-        !    not_equals = (arg1 .ne. arg2)
-        !end function assert_neq
-
-        !subroutine run_test(my_test)
-        !    type(Test), intent(inout):: my_test
-        !    
-        !    my_test%result = my_test%test_function()
-        !end subroutine run_test
-
-        !subroutine run_and_print(my_test, test_number)
-        !    type(Test), intent(inout):: my_test
-        !    integer, intent(in):: test_number
-        !
-        !    call run_test(my_test)
-        !    call test_result_msg(my_test, test_number)
-        !end subroutine run_and_print
 
         subroutine test_result_msg(my_test, test_number)
             type(Test), intent(in)::my_test
