@@ -1,5 +1,6 @@
 !TODO:  1.  Allow running of tests to be deferred/ignored       
 !       2.  Make naming test sets optional
+!       3.  Simpler test set declaration?
 
 module fort_test
     
@@ -89,8 +90,8 @@ module fort_test
             type(Result):: my_result
             character(len = 32):: arg1_str, arg2_str
 
-            write(arg1_str, '(f20.14)') arg1
-            write(arg2_str, '(f20.14)') arg2
+            write(arg1_str, '(f32.28)') arg1
+            write(arg2_str, '(f32.28)') arg2
 
             my_result = build_assertion(arg1_str, arg2_str, (arg1 == arg2), "==")
         end function d_assert_eq
@@ -122,8 +123,8 @@ module fort_test
             type(Result):: my_result
             character(len = 32):: arg1_str, arg2_str
 
-            write(arg1_str, '(f20.14)') arg1
-            write(arg2_str, '(f20.14)') arg2
+            write(arg1_str, '(f32.28)') arg1
+            write(arg2_str, '(f32.28)') arg2
 
             my_result = build_assertion(arg1_str, arg2_str, (arg1 .ne. arg2), "!=")
         end function d_assert_neq
