@@ -90,7 +90,7 @@ module tests
         subroutine test_result_msg(my_test, test_number)
             type(Test), intent(in)::my_test
             integer, intent(in):: test_number
-            character(len = :), allocatable:: result_string, output_string
+            character(len = :), allocatable:: output_string
             character(len = 2):: test_number_string
 
             write(test_number_string, '(I2)') test_number
@@ -105,7 +105,7 @@ module tests
         end subroutine test_result_msg
 
         subroutine print_testset_results(my_testset)
-            character(len = 8):: num_passed_string, num_failed_string, total_string, blank_str
+            character(len = 8):: num_passed_string, num_failed_string, total_string
             type(TestSet), intent(in) :: my_testset
             integer:: num_tests = 0
 
