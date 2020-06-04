@@ -1,5 +1,7 @@
-module my_test_funcs
-    use tests
+module my_tests
+    use fort_test
+
+    implicit none 
 
     contains
         function four_equals_four() result(test_result)
@@ -16,4 +18,4 @@ module my_test_funcs
             logical::falseval
             falseval = .false.
         end function false
-end module my_test_funcs
+end module

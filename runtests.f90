@@ -1,13 +1,14 @@
-program mytests
+program runtests
     
-    use tests
-    use my_test_funcs
+    use my_tests
+    use fort_test
+    
     implicit none
 
-    type(TestSet):: my_testset, my_testset_2
-    type(TestSet), dimension(:), allocatable:: my_tests
+    type(TestSet):: testset_1, testset_2
+    type(TestSet), dimension(:), allocatable:: tests
 
-    my_testset = new_testset(           &
+    testset_1 = new_testset(            &
         "My testset",                   & 
         (/                              &
             new_test(                   &
@@ -25,7 +26,7 @@ program mytests
         /)                              &
     )
 
-    my_testset_2 = new_testset(         &
+    testset_2 = new_testset(            &
         "2nd testset",                  & 
         (/                              &
             new_test(                   &
@@ -39,6 +40,6 @@ program mytests
         /)                              &
     )                                   
 
-    my_tests = (/ my_testset, my_testset_2/)
-    call print_all_test_results(my_tests)
-end program mytests
+    tests = (/ testset_1, testset_2/)
+    call print_all_test_results(tests)
+end program

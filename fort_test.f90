@@ -1,4 +1,4 @@
-module tests
+module fort_test
 
     type Test
         character(len = :), allocatable:: name
@@ -145,4 +145,5 @@ module tests
             end do
 
         end subroutine print_all_test_results
-end
+
+end module
