@@ -9,7 +9,7 @@ TEST_MOD_OBJS=$(patsubst %.f90,%.o,$(TEST_MODS))
 # Compiler/Linker settings
 FC = gfortran
 FLFLAGS = -g
-FCFLAGS = -g -c -Wall -Wextra -Wconversion -Og -pedantic -fcheck=bounds -fmax-errors=5
+FCFLAGS = -g #-c -Wall -Wextra -Wconversion -Og -pedantic -fcheck=bounds -fmax-errors=5
 TEST_PROGRAM = runtests
 TEST_OBJ = $(TEST_PROGRAM).o
 
