@@ -1,4 +1,4 @@
-# fort-test
+# fort_test
 Very lightweight testing framework for FORTRAN
 
 ## USAGE:
