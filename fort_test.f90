@@ -90,8 +90,8 @@ module fort_test
             type(Result):: my_result
             character(len = 32):: arg1_str, arg2_str
 
-            write(arg1_str, '(f32.28)') arg1
-            write(arg2_str, '(f32.28)') arg2
+            write(arg1_str, '(d17.10)') arg1
+            write(arg2_str, '(d17.10)') arg2
 
             my_result = build_assertion(arg1_str, arg2_str, (arg1 == arg2), "==")
         end function d_assert_eq
@@ -123,8 +123,8 @@ module fort_test
             type(Result):: my_result
             character(len = 32):: arg1_str, arg2_str
 
-            write(arg1_str, '(f32.28)') arg1
-            write(arg2_str, '(f32.28)') arg2
+            write(arg1_str, '(d17.10)') arg1
+            write(arg2_str, '(d17.10)') arg2
 
             my_result = build_assertion(arg1_str, arg2_str, (arg1 .ne. arg2), "!=")
         end function d_assert_neq
@@ -167,8 +167,8 @@ module fort_test
    
             if (present(atol)) absolute_tolerance = atol
 
-            write(arg1_str, '(f32.28)') arg1
-            write(arg2_str, '(f32.28)') arg2
+            write(arg1_str, '(d17.10)') arg1
+            write(arg2_str, '(d17.10)') arg2
 
             passed = (abs(arg1 - arg2) .le. (absolute_tolerance + relative_tolerance * max(abs(arg1), abs(arg2))))
 
