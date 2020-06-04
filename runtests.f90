@@ -1,6 +1,5 @@
 program runtests
     
-    use my_tests
     use fort_test
     
     implicit none

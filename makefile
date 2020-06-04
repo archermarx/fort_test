@@ -17,3 +17,5 @@ test:
 	$(FC) -o $(TEST_PROGRAM) $(COMMON_FILES) $(TEST_FILES) $(TEST_MAIN)
 clean:
 	rm -rf *.mod *.o $(EXECUTABLES)
+example:
+	$(FC) -o $(TEST_PROGRAM) runtests.f90 fort_test.f90
