@@ -6,7 +6,6 @@ program runtests
 
     type(TestSet):: testset_1, testset_2
     type(TestSet), dimension(:), allocatable:: tests
-    type(Result):: my_result
 
     testset_1 = new_testset(            &
         (/                              &
@@ -26,5 +25,5 @@ program runtests
     )                                   
 
     tests = (/ testset_1, testset_2/)
-    call print_all_test_results(tests)
+    call print_results(tests)
 end program

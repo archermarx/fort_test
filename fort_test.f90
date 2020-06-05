@@ -1,5 +1,4 @@
 !TODO:  1.  Allow running of tests to be deferred/ignored       
-!       2.  Make naming test sets optional
 !       3.  Simpler test set declaration?
 
 module fort_test
@@ -10,7 +9,7 @@ module fort_test
     end type
 
     type TestSet
-        character(len = 16):: name
+        character(len = :), allocatable:: name
         type(Result), dimension(:), allocatable:: test_list
         integer:: num_passed, num_failed
     end type
@@ -30,10 +29,17 @@ module fort_test
     contains
         function new_testset(test_list, name) result(my_testset)
             type(TestSet):: my_testset
-            character(len = *), intent(in):: name
+            character(len = *), optional:: name
+            character(len = :), allocatable::testset_name
             type(Result), dimension(:), intent(in):: test_list
 
-            my_testset%name = name
+            if (present(name)) then
+                testset_name = name
+            else
+                testset_name = "noname"
+            endif
+
+            my_testset%name = testset_name
             my_testset%test_list = test_list
             my_testset%num_passed = 0
             my_testset%num_failed = 0
@@ -203,17 +209,26 @@ module fort_test
             print *, output_string
         end subroutine print_result_msg
 
-        subroutine print_testset_results(my_testset)
-            character(len = 8):: num_passed_string, num_failed_string, total_string
+        subroutine print_testset_results(my_testset, testset_number)
+            character(len = 8):: num_passed_string, num_failed_string, total_string, number_string
+            character(len = 20):: name_string
             type(TestSet), intent(in) :: my_testset
+            integer, intent(in):: testset_number
             integer:: num_tests = 0
 
             write(num_passed_string, '(I2)') my_testset%num_passed
             write(num_failed_string, '(I2)') my_testset%num_failed
             write(total_string, '(I2)') my_testset%num_passed + my_testset%num_failed
+            write(number_string, '(I2)') testset_number
+
+            if (my_testset%name == 'noname') then
+                name_string = "Test Set "//trim(adjustl(number_string)) 
+            else
+                name_string = my_testset%name
+            endif 
 
             if (my_testset%num_failed > 0) then
-                print *, my_testset%name//'|'//& 
+                print *, name_string//'|'//& 
                      achar(27)//'[92m'//adjustr(num_passed_string)//achar(27)//'[0m'//&
                      achar(27)//'[31m'//adjustr(num_failed_string)//achar(27)//'[0m'//&
                      achar(27)//'[96m'//adjustr(total_string)//achar(27)//'[0m'
@@ -222,7 +237,7 @@ module fort_test
                     call print_result_msg(my_testset%test_list(i), i)
                 end do 
             else
-                print *, my_testset%name//'|'//& 
+                print *, name_string//'|'//& 
                      achar(27)//'[92m'//adjustr(num_passed_string)//achar(27)//'[0m'//&
                      "        "// & 
                      achar(27)//'[96m'//adjustr(total_string)//achar(27)//'[0m'
@@ -230,9 +245,9 @@ module fort_test
 
         end subroutine print_testset_results
 
-        subroutine print_all_test_results(testsets)
+        subroutine print_results(testsets)
             type(TestSet), dimension(:), intent(in):: testsets
-            print *, achar(27)//'[1m'//'Test summary:   '//achar(27)//'[0m|'//& 
+            print *, achar(27)//'[1m'//'Test summary:       '//achar(27)//'[0m|'//& 
                      achar(27)//'[1m'//achar(27)//'[92m'//'  Passed'//achar(27)//'[0m'//achar(27)//'[0m'//&
                      achar(27)//'[1m'//achar(27)//'[31m'//'  Failed'//achar(27)//'[0m'//achar(27)//'[0m'//&
                      achar(27)//'[1m'//achar(27)//'[96m'//'   Total'//achar(27)//'[0m'//achar(27)//'[0m'
@@ -240,9 +255,9 @@ module fort_test
             num_testsets = size(testsets)
 
             do i = 1, num_testsets
-                call print_testset_results(testsets(i))
+                call print_testset_results(testsets(i), i)
             end do
 
-        end subroutine print_all_test_results
+        end subroutine print_results
 
 end module
