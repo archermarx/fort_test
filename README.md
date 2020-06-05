@@ -1,5 +1,5 @@
 # fort_test
-Very lightweight testing framework for FORTRAN, written entirely in FORTRAN. Supports basic assertions and running of test sets. Does not support fancy error messages or reading out the specific line of code that errored.
+Very lightweight testing framework for FORTRAN, written entirely in FORTRAN. Supports basic assertions and running of test sets. 
 
 ## Installation
 Clone the fort_test repo into your project directory
@@ -14,7 +14,7 @@ use fort-tests
 
 At the top of your file. You can make a runtests.f90 file that can compile to a runtests executable to perform all of your tests without compiling the main program you're working on. I have included a basic makefile and example runtests.f90 file to show how you could do this
 
-To make a test file, first declare at least one TestSet structure and (optionally) a named array of TestSets. 
+To make a test file, first declare at least one `TestSet` structure and (optionally) a named array of `TestSet`s. 
 
 ```f95
 type(TestSet):: testset_1, testset_2
