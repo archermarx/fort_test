@@ -9,7 +9,7 @@ Clone the fort_test repo into your project directory
 Simply type
 
 ``` f95
-use fort-tests
+use fort_tests
 ```
 
 At the top of your file. You can make a runtests.f90 file that can compile to a runtests executable to perform all of your tests without compiling the main program you're working on. I have included a basic makefile and example runtests.f90 file to show how you could do this
