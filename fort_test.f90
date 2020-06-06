@@ -1,5 +1,24 @@
-!TODO:  1.  Allow running of tests to be deferred/ignored       
-!       3.  Simpler test set declaration?
+! Part of the fort_test repository https://github.com/archermarx/fort_test
+! Written by Thomas Marks, 2020
+! Published with the GPL license
+
+!TODO:  
+!       1.  Return error codes
+!       2.  Switch print statements to write statements   
+!       3.  Write test suite for the test program
+!       4.  More types
+!           a. Arrays
+!           b. Strings
+!           c. Arbitrary precision real?
+!           d. Complex
+!           e. Different integer types
+!       5. More assertions
+!           a. assert_positive and assert_negative
+!           b. assert_gt, assert_geq, assert_lt, assert_leq
+!       6. Simpler test set declaration?
+!       7. Allow running of tests to be deferred/ignored   
+!       8. Look into preprocessor macros to print lines of source code
+!       9. Make little example project based on tutorial
 
 module fort_test
     

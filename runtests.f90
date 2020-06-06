@@ -1,3 +1,8 @@
+! Part of the fort_test repository https://github.com/archermarx/fort_test
+! Thomas Marks, 2020
+! Published with the GPL license
+
+
 program runtests
     
     use fort_test
