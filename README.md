@@ -1,4 +1,10 @@
 # fort_test
+
+
+[![Build Status](https://travis-ci.com/archermarx/fort_test.svg?branch=master)](https://travis-ci.com/archermarx/fort_test) 
+[![codecov](https://codecov.io/gh/archermarx/fort_test/branch/master/graph/badge.svg)](https://codecov.io/gh/archermarx/fort_test)
+
+
 Very lightweight testing framework for FORTRAN, written entirely in FORTRAN. Supports basic assertions and running of test sets. 
 
 ## Installation
