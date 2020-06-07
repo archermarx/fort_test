@@ -41,7 +41,7 @@ testset_1 = new_testset(    &
 )
 
 my_testsets = (/ testset_1 /)
-call print_results(my_testsets)
+call run_and_exit(my_testsets)
 ```
 
 All of our tests are self evidently correct, so we should get the following output, all nicely colored:
@@ -62,7 +62,7 @@ testset_2 = new_testset(    &
 )
 
 my_testsets = (/ testset_1, testset_2 /)
-call print_results(my_testsets)
+call run_and_exit(my_testsets)
 ```
 
 ![Test output 2][Failing tests]
