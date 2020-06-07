@@ -122,9 +122,9 @@ program runtests
         "Failures"  &
     )
 
-    num_failed = run_all((/failure_tests, new_testset((/assert_eq(2, 3)/))/))
-
     write(*, *) "Running expected failures..."
+    num_failed = run_all((/failure_tests, new_testset((/assert_eq(2, 3)/))/))
+    
     if (num_failed .ne. size(failure_tests%test_list) + 1) then
         write(error_unit, *) "Not all expected failures failed"
         call exit(1)
