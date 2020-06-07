@@ -9,7 +9,7 @@ program runtests
 
     implicit none
 
-    integer:: num_failed, status = 0
+    integer:: num_failed
     type(TestSet):: logical_tests, integer_tests, real_tests, string_tests, failure_tests
     type(TestSet), dimension(:), allocatable:: tests
 
