@@ -5,3 +5,5 @@
 *.o
 *.exe
 !makefile
+/docs/*
+!Doxyfile

@@ -1,23 +1,31 @@
-! Part of the fort_test repository https://github.com/archermarx/fort_test
-! Written by Thomas Marks, 2020
-! Published with the GPL license
-!
-!TODO:  
-!       1. Documentation
-!       2. More types
-!           a. Arrays (BACKBURNER)
-!           c. Real128
-!           d. Complex (BACKBURNER)
-!           e. int8, int16
-!       3.  Return error codes
-!       4. Simpler test set declaration?
-!       5. Allow running of tests to be deferred/ignored   
-!       6. Look into preprocessor macros to print lines of source code
-!       7. Make little example project based on tutorial
-
+!> The fort_test module
+!!
+!! Part of the fort_test repository https://github.com/archermarx/fort_test
+!! @author Thomas Marks
+!!
+!! Published with the GPL license
+!! @todo 
+!!  * More documentation
+!!  * Return error codes
+!!  * Simpler test set declaration?
+!!  * Allow running of tests to be deferred/ignored   
+!!  * Look into preprocessor macros to print lines of source code
+!!  * Make little example project based on tutorial
+!!  * More types
+!!       * Array
+!!       * Real128
+!!       * Complex
+!!       * int8, int16
 module fort_test
 
     use iso_fortran_env
+
+    implicit none 
+
+    private 
+
+    public::    TestSet, Result, new_testset, print_results, assert_eq, assert_neq, assert_positive, &
+                assert_negative, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx
     
     type Result
         character(len = :), allocatable:: assertion
@@ -30,6 +38,11 @@ module fort_test
         integer:: num_passed, num_failed
     end type
 
+
+    !> Test whether two things are equal
+    !! @param[in] arg1
+    !! @param[out] arg2 
+    !! @return Result
     interface assert_eq
         procedure int32_assert_eq, int64_assert_eq, &
                   real32_assert_eq, real64_assert_eq, &
@@ -82,6 +95,7 @@ module fort_test
             character(len = *), optional:: name
             character(len = :), allocatable::testset_name
             type(Result), dimension(:), intent(in):: test_list
+            integer:: i, num_tests
 
             if (present(name)) then
                 testset_name = name
@@ -586,7 +600,7 @@ module fort_test
             character(len = 20):: name_string
             type(TestSet), intent(in) :: my_testset
             integer, intent(in):: testset_number
-            integer:: num_tests = 0
+            integer:: i, num_tests = 0
 
             write(num_passed_string, '(I2)') my_testset%num_passed
             write(num_failed_string, '(I2)') my_testset%num_failed
@@ -618,6 +632,7 @@ module fort_test
         end subroutine print_testset_results
 
         subroutine print_results(testsets)
+            integer:: i, num_testsets
             type(TestSet), dimension(:), intent(in):: testsets
             write(*, *) achar(27)//'[1m'//'Test summary:       '//achar(27)//'[0m|'//& 
                      achar(27)//'[1m'//achar(27)//'[92m'//'  Passed'//achar(27)//'[0m'//achar(27)//'[0m'//&
