@@ -1,7 +1,7 @@
 FC = gfortran
 TEST_PROGRAM = runtests
 PROGRAM = main
-FLAGS = --coverage
+TEST_FLAGS = --coverage -O0
 
 EXECUTABLES = $(TEST_PROGRAM) $(PROGRAM)
 SOURCE_DIR = src
@@ -15,7 +15,7 @@ all:
 default: 
 	$(FC) -o $(PROGRAM) $(PROGRAM_MAIN)
 test: 
-	$(FC) -o $(TEST_PROGRAM) $(COMMON_FILES) $(TEST_FILES) $(TEST_MAIN)
+	$(FC) -o $(TEST_FLAGS) $(TEST_PROGRAM) $(COMMON_FILES) $(TEST_FILES) $(TEST_MAIN)
 clean:
 	rm -rf *.mod *.o $(EXECUTABLES)
 example:

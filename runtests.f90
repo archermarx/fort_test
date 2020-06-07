@@ -23,7 +23,7 @@ program runtests
     integer_tests = new_testset(    &
         (/ &
             assert_eq(10_int32, 10_int32),      &
-            assert_eq(20_int64, 30_int64),      &
+            assert_eq(20_int64, 20_int64),      &
 
             assert_neq(10_int32, 20_int32),     &
             assert_neq(10_int64, 20_int64),     &
