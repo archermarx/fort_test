@@ -3,24 +3,17 @@
 ! Published with the GPL license
 !
 !TODO:  
-!       1.  Return error codes
-!       2.  Switch print statements to write statements (DONE)  
-!       3.  Write test suite for the test program (DONE)
-!       4.  More types
+!       1. Documentation
+!       2. More types
 !           a. Arrays (BACKBURNER)
-!           b. Strings (DONE)
-!           c. Arbitrary precision real (ONLY NEED REAL128)
+!           c. Real128
 !           d. Complex (BACKBURNER)
-!           e. Different integer types (ADDED int64, need to add int8 and int16)
-!           f. Logical (DONE)
-!       5. More assertions
-!           a. assert_positive and assert_negative (DONE)
-!           b. assert_gt, assert_geq, assert_lt, assert_leq (DONE)
-!       6. Simpler test set declaration?
-!       7. Allow running of tests to be deferred/ignored   
-!       8. Look into preprocessor macros to print lines of source code
-!       9. Make little example project based on tutorial
-!       10. Documentation
+!           e. int8, int16
+!       3.  Return error codes
+!       4. Simpler test set declaration?
+!       5. Allow running of tests to be deferred/ignored   
+!       6. Look into preprocessor macros to print lines of source code
+!       7. Make little example project based on tutorial
 
 module fort_test
 
