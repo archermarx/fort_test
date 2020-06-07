@@ -103,12 +103,6 @@ program runtests
     )
 
     tests = (/ logical_tests, integer_tests, real_tests, string_tests /)
-    num_failed =  run_all(tests)
-
-    if (num_failed > 0) then 
-        write(error_unit, *) "Some tests failed"
-        status = 1
-    endif
 
     failure_tests = new_testset(    &
         (/  &
@@ -130,10 +124,12 @@ program runtests
 
     num_failed = run_all((/failure_tests, new_testset((/assert_eq(2, 3)/))/))
 
+    write(*, *) "Running expected failures..."
     if (num_failed .ne. size(failure_tests%test_list) + 1) then
         write(error_unit, *) "Not all expected failures failed"
-        status = 1
+        call exit(1)
     endif
 
-    call exit(status)
+    write(*, *) NEW_LINE('a')//"Running actual tests..."
+    call run_and_exit(tests)
 end program

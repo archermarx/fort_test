@@ -640,6 +640,16 @@ module fort_test
                 call print_testset_results(testsets(i), i)
                 num_failed = num_failed + testsets(i)%num_failed
             end do
-
         end function
+
+        subroutine run_and_exit(testsets)
+            integer:: num_failed
+            type(TestSet), dimension(:), intent(in):: testsets
+            num_failed = run_all(testsets)
+            if (num_failed > 0) then
+                call exit(1)
+            else
+                call exit(0)
+            endif
+        end subroutine
 end module 
