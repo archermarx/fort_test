@@ -20,6 +20,7 @@
 !       7. Allow running of tests to be deferred/ignored   
 !       8. Look into preprocessor macros to print lines of source code
 !       9. Make little example project based on tutorial
+!       10. Documentation
 
 module fort_test
 

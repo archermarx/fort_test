@@ -2,7 +2,6 @@
 ! Thomas Marks, 2020
 ! Published with the GPL license
 
-
 program runtests
      
     use fort_test
