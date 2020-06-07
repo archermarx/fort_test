@@ -15,7 +15,7 @@ all:
 default: 
 	$(FC) -o $(PROGRAM) $(PROGRAM_MAIN)
 test: 
-	$(FC) -o $(TEST_FLAGS) $(TEST_PROGRAM) $(COMMON_FILES) $(TEST_FILES) $(TEST_MAIN)
+	$(FC) $(TEST_FLAGS) -o $(TEST_PROGRAM) $(COMMON_FILES) $(TEST_FILES) $(TEST_MAIN)
 clean:
 	rm -rf *.mod *.o $(EXECUTABLES)
 example:
