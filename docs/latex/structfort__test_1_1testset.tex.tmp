@@ -1,0 +1,49 @@
+\hypertarget{structfort__test_1_1testset}{}\section{fort\+\_\+test\+:\+:testset Type Reference}
+\label{structfort__test_1_1testset}\index{fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}}
+
+
+Collaboration diagram for fort\+\_\+test\+:\+:testset\+:
+% FIG 0
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+character(len=\+:), allocatable \hyperlink{structfort__test_1_1testset_a9e9905477d2e687942823ef04b0afa2d}{name}
+\item 
+type(\hyperlink{structfort__test_1_1result}{result}), dimension(\+:), allocatable \hyperlink{structfort__test_1_1testset_ad2ee704e6093277e835bc6e7b7a7ba3e}{test\+\_\+list}
+\item 
+integer \hyperlink{structfort__test_1_1testset_aa9f1cd8825d3b00b23f1ac521cf08366}{num\+\_\+passed}
+\item 
+integer \hyperlink{structfort__test_1_1testset_ad6e372f03f6d0e200e1ddaa1e0d760a1}{num\+\_\+failed}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structfort__test_1_1testset_a9e9905477d2e687942823ef04b0afa2d}\label{structfort__test_1_1testset_a9e9905477d2e687942823ef04b0afa2d}} 
+\index{fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}!name@{name}}
+\index{name@{name}!fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}}
+\subsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily character(len = \+:), allocatable fort\+\_\+test\+::testset\+::name}
+
+\mbox{\Hypertarget{structfort__test_1_1testset_ad6e372f03f6d0e200e1ddaa1e0d760a1}\label{structfort__test_1_1testset_ad6e372f03f6d0e200e1ddaa1e0d760a1}} 
+\index{fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}!num\+\_\+failed@{num\+\_\+failed}}
+\index{num\+\_\+failed@{num\+\_\+failed}!fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}}
+\subsubsection{\texorpdfstring{num\+\_\+failed}{num\_failed}}
+{\footnotesize\ttfamily integer fort\+\_\+test\+::testset\+::num\+\_\+failed}
+
+\mbox{\Hypertarget{structfort__test_1_1testset_aa9f1cd8825d3b00b23f1ac521cf08366}\label{structfort__test_1_1testset_aa9f1cd8825d3b00b23f1ac521cf08366}} 
+\index{fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}!num\+\_\+passed@{num\+\_\+passed}}
+\index{num\+\_\+passed@{num\+\_\+passed}!fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}}
+\subsubsection{\texorpdfstring{num\+\_\+passed}{num\_passed}}
+{\footnotesize\ttfamily integer fort\+\_\+test\+::testset\+::num\+\_\+passed}
+
+\mbox{\Hypertarget{structfort__test_1_1testset_ad2ee704e6093277e835bc6e7b7a7ba3e}\label{structfort__test_1_1testset_ad2ee704e6093277e835bc6e7b7a7ba3e}} 
+\index{fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}!test\+\_\+list@{test\+\_\+list}}
+\index{test\+\_\+list@{test\+\_\+list}!fort\+\_\+test\+::testset@{fort\+\_\+test\+::testset}}
+\subsubsection{\texorpdfstring{test\+\_\+list}{test\_list}}
+{\footnotesize\ttfamily type(\hyperlink{structfort__test_1_1result}{result}), dimension(\+:), allocatable fort\+\_\+test\+::testset\+::test\+\_\+list}
+
+
+
+The documentation for this type was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{fort__test_8f90}{fort\+\_\+test.\+f90}\end{DoxyCompactItemize}
