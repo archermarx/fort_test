@@ -17,6 +17,6 @@ default:
 test: 
 	$(FC) $(TEST_FLAGS) -o $(TEST_PROGRAM) $(COMMON_FILES) $(TEST_FILES) $(TEST_MAIN)
 clean:
-	rm -rf *.mod *.o $(EXECUTABLES)
+	rm -rf *.mod *.o $(EXECUTABLES) *.gcda *.gcno
 example:
 	$(FC) -o $(TEST_PROGRAM) runtests.f90 fort_test.f90

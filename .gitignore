@@ -4,6 +4,8 @@
 *.mod
 *.o
 *.exe
+*.gcda
+*.gcno
 !makefile
 /docs/*
 !Doxyfile
