@@ -6,7 +6,6 @@
 !! Published with the GPL license
 !! @todo 
 !!  * More documentation
-!!  * Return error codes
 !!  * Simpler test set declaration?
 !!  * Allow running of tests to be deferred/ignored   
 !!  * Look into preprocessor macros to print lines of source code
@@ -24,7 +23,7 @@ module fort_test
 
     private 
 
-    public::    TestSet, Result, new_testset, print_results, assert_eq, assert_neq, assert_positive, &
+    public::    TestSet, Result, new_testset, print_and_exit, assert_eq, assert_neq, assert_positive, &
                 assert_negative, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx
     
     type Result
@@ -585,14 +584,13 @@ module fort_test
             write(test_number_string, '(I2)') test_number
             test_name_string = '   Test '//test_number_string
 
-            if (my_result%passed) then
-                output_string = test_name_string//" passed."
-            else
+            if (.not. my_result%passed) then
+!                output_string = test_name_string//" passed."
+!            else
                 output_string = achar(27)//'[31m'//test_name_string//' failed.'//achar(27)//'[0m'//NEW_LINE('A')// &
                                 "       "//'      Assertion "'//my_result%assertion//'" not satisfied'
+                write(*,*) output_string
             endif
-
-            write(*,*) output_string
         end subroutine print_result_msg
 
         subroutine print_testset_results(my_testset, testset_number)
@@ -631,20 +629,21 @@ module fort_test
 
         end subroutine print_testset_results
 
-        subroutine print_results(testsets)
-            integer:: i, num_testsets
+        subroutine print_and_exit(testsets)
+            integer:: i, status = 0
             type(TestSet), dimension(:), intent(in):: testsets
             write(*, *) achar(27)//'[1m'//'Test summary:       '//achar(27)//'[0m|'//& 
                      achar(27)//'[1m'//achar(27)//'[92m'//'  Passed'//achar(27)//'[0m'//achar(27)//'[0m'//&
                      achar(27)//'[1m'//achar(27)//'[31m'//'  Failed'//achar(27)//'[0m'//achar(27)//'[0m'//&
                      achar(27)//'[1m'//achar(27)//'[96m'//'   Total'//achar(27)//'[0m'//achar(27)//'[0m'
-                     
-            num_testsets = size(testsets)
 
-            do i = 1, num_testsets
+            do i = 1, size(testsets)
                 call print_testset_results(testsets(i), i)
+                if ((testsets(i)%num_failed > 0) .and. (status == 0)) then
+                    status = 1
+                endif
             end do
 
-        end subroutine print_results
-
-end module
+            call exit(status)
+        end subroutine
+end module 
