@@ -9,11 +9,13 @@ program runtests
 
     implicit none
 
-    type(TestSet):: logical_tests, integer_tests, real_tests, string_tests
+    integer:: num_failed, status
+    type(TestSet):: logical_tests, integer_tests, real_tests, string_tests, failure_tests
     type(TestSet), dimension(:), allocatable:: tests
 
     logical_tests = new_testset(    &
         (/  &
+            assert(.true.) ,    &
             assert_eq((2 + 2 == 4), (4 + 4 == 8)), &
             assert_neq((2 + 2 == 4), (4 + 3 == 8)) &
         /), &
@@ -101,5 +103,37 @@ program runtests
     )
 
     tests = (/ logical_tests, integer_tests, real_tests, string_tests /)
-    call print_and_exit(tests)
+    num_failed =  run_all(tests)
+
+    if (num_failed > 0) then 
+        write(error_unit, *) "Some tests failed"
+        status = 1
+    endif
+
+    failure_tests = new_testset(    &
+        (/  &
+            assert(.false.), &
+            assert_eq(2.0d0, 3.0d0), &
+            assert_geq(2.0, 3.0), &
+            assert_gt(3_int32, 4_int32), &
+            assert_neq(.false., .false.), &
+            assert_positive(-1_int64), &
+            assert_negative(2.0), &
+            assert_approx(2.0d0, 3.0d0), &
+            assert_neq("Cheese", "Cheese"), &
+            assert_eq("Cheese", "Pizza"), &
+            assert_lt(4.0, 1.0), &
+            assert_leq(-320_int64, -500_int64) &
+        /), &
+        "Failures"  &
+    )
+
+    num_failed = run_all((/failure_tests/))
+
+    if (num_failed .ne. size(failure_tests%test_list)) then
+        write(error_unit, *) "Not all expected failures failed"
+        status = 1
+    endif
+
+    call exit(status)
 end program
