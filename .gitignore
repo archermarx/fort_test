@@ -6,6 +6,6 @@
 *.exe
 *.gcda
 *.gcno
-!makefile
 /docs/*
+!makefile
 !Doxyfile
