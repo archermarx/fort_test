@@ -128,7 +128,7 @@ program runtests
         "Failures"  &
     )
 
-    num_failed = run_all((/failure_tests/))
+    num_failed = run_all((/failure_tests, new_testset((/assert_eq(2, 3)/))/))
 
     if (num_failed .ne. size(failure_tests%test_list)) then
         write(error_unit, *) "Not all expected failures failed"
