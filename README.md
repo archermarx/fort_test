@@ -3,7 +3,7 @@
 
 # fort_test
 
-Very lightweight testing framework for FORTRAN, written entirely in FORTRAN. Supports basic assertions and running of test sets. 
+Very lightweight testing framework for Fortran, written entirely in Fortran. Supports basic assertions and running of test sets. 
 
 ## Installation
 Clone the fort_test repo into your project directory
