@@ -236,8 +236,8 @@ module fort_test
 
     end function
 
-    integer(i32) function logical_to_int(log) result(int)
-        logical:: log
+    pure integer(i32) function logical_to_int(log) result(int)
+        logical, intent(in):: log
         if (log) then
             int = 1
         else
