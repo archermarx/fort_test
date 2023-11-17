@@ -1,0 +1,22 @@
+name: tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: sudo apt-get install gfortran
+    - run: make
+    - run: ./runtests
+    - run: gcov -pb runtests-fort_test.gcno
+
+    - uses: codecov/codecov-action@v3
