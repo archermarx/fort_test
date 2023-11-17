@@ -1,40 +1,29 @@
-!> The fort_test module
+!> The fort_test module v1.3.0
 !!
 !! Part of the fort_test repository https://github.com/archermarx/fort_test
 !! @author Thomas Marks
 !!
 !! Published with the GPL license
 !! @todo
-!!  * More documentation
 !!  * Simpler test set declaration?
 !!  * Allow running of tests to be deferred/ignored
 !!  * Look into preprocessor macros to print lines of source code
-!!  * Make little example project based on tutorial
+!!  * automatic test registration
+!!  * preprocessor generics?
 !!  * More types
-!!       * Real128
 !!       * Complex
-!!       * int8, int16
 module fort_test
-
     use, intrinsic:: iso_fortran_env, only : &
-        stderr => error_unit, &
-        stdin => input_unit, &
-        stdout => output_unit, &
-        f32  => real32, &
-        f64  => real64, &
-        f128 => real128, &
-        i8  => int8, &
-        i16 => int16, &
-        i32 => int32, &
-        i64 => int64
+        stderr => error_unit, stdin => input_unit, stdout => output_unit, &
+        f32  => real32, f64  => real64, f128 => real128, &
+        i8  => int8, i16 => int16, i32 => int32, i64 => int64
 
     implicit none
 
     private
 
-    public::    TestSet, Result, new_testset, run_all, assert_eq, assert_neq, &
-                assert_gt, assert_geq, assert_lt, assert_leq, assert_approx, assert, &
-                run_and_exit
+    public:: TestSet, Result, new_testset, run_all, run_and_exit, &
+             assert, assert_eq, assert_neq, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx
 
     type Result
         character(len = :), allocatable:: assertion
@@ -51,13 +40,11 @@ module fort_test
     character(len = *), parameter:: FG_COLOR_PASS = "light green"
     character(len = *), parameter:: FG_COLOR_FAIL = "red"
     character(len = *), parameter:: FG_COLOR_TOTAL = "cyan"
-
     character(len = *), parameter:: BG_COLOR_HEADER = "black"
     character(len = *), parameter:: HEADER_SUMMARY = "Test summary"
     character(len = *), parameter:: HEADER_PASS = "Passed"
     character(len = *), parameter:: HEADER_FAIL = " Failed"
     character(len = *), parameter:: HEADER_TOTAL = " Total"
-
     character(len = *), parameter:: FLOAT_FORMAT = '(g0)'
 
     !> Convert the argument to a string
@@ -162,9 +149,7 @@ module fort_test
     !============================================================
     !               testset construction
     !============================================================
-
-    function new_testset(test_list, name) result(my_testset)
-        type(TestSet):: my_testset
+    type(TestSet) function new_testset(test_list, name) result(my_testset)
         character(len = *), optional:: name
         character(len = :), allocatable::testset_name
         type(Result), dimension(:), intent(in):: test_list
@@ -193,27 +178,73 @@ module fort_test
         end do
     end function
 
-    function assert(bool) result(my_result)
+    type(Result) function assert(bool) result(my_result)
         logical, intent(in):: bool
-        type(Result):: my_result
-
-        if (bool) then
-            my_result%assertion = "true"
-        else
-            my_result%assertion = "false"
-        endif
-
+        my_result%assertion = to_string(bool)
         my_result%passed = bool
     end function
 
-    function build_assertion(arg1_str, arg2_str, passed, comparision) result(my_result)
+    type(Result) function build_assertion(arg1_str, arg2_str, passed, comparision) result(my_result)
         character(len = *):: arg1_str, arg2_str, comparision
-        type(Result):: my_result
         logical:: passed
-
         my_result%assertion = trim(adjustl(arg1_str))//" "//comparision//" "//trim(adjustl(arg2_str))
         my_result%passed = passed
     end function build_assertion
+
+    !============================================================
+    !               running tests
+    !============================================================
+    integer(i32) function run_all(testsets) result(num_failed)
+        type(TestSet), dimension(:):: testsets
+        integer(i32):: i, column_widths(4), num_pass, num_fail, num_total
+        character(len = 4):: number_string
+
+        ! Initialize column widths so that they can contain the header text
+        column_widths = (/ len(HEADER_SUMMARY), len(HEADER_PASS), len(HEADER_FAIL), len(HEADER_TOTAL) /)
+
+        ! Get testset dimensions for printing
+        do i = 1, size(testsets)
+            num_pass  = testsets(i)%num_passed
+            num_fail  = testsets(i)%num_failed
+            num_total = num_pass + num_fail
+
+            ! Give proper name to test set if it doesn't have one
+            if (testsets(i)%name == 'noname') then
+                write(number_string, '(I4)') i
+                testsets(i)%name = "Test Set "// trim(adjustl(number_string))
+            end if
+
+            column_widths(1) = max(column_widths(1), len(testsets(i)%name))
+            column_widths(2) = max(column_widths(2), num_digits(num_pass))
+            column_widths(3) = max(column_widths(3), num_digits(num_fail))
+            column_widths(4) = max(column_widths(4), num_digits(num_total))
+        end do
+
+        ! Add one to each column width for spacing
+        column_widths = column_widths + 1
+
+        ! Print the header
+        call print_header(column_widths)
+
+        ! Print results of each testset
+        num_failed = 0
+        do i = 1, size(testsets)
+            call print_testset_results(testsets(i), column_widths)
+            num_failed = num_failed + testsets(i)%num_failed
+        end do
+
+    end function
+
+    subroutine run_and_exit(testsets)
+        type(TestSet), dimension(:), intent(in):: testsets
+        integer(i32):: num_failed
+        num_failed = run_all(testsets)
+        if (num_failed > 0) then
+            call exit(1)
+        else
+            call exit(0)
+        endif
+    end subroutine
 
     !============================================================
     !               methods for to_string
@@ -487,7 +518,6 @@ module fort_test
     !============================================================
     !               methods for assert_neq
     !============================================================
-
     type(Result) function logical_assert_neq(arg1, arg2) result(my_result)
         logical, intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 .neqv. arg2), "!=")
@@ -592,7 +622,6 @@ module fort_test
     !============================================================
     !               methods for assert_gt
     !============================================================
-
     type(Result) function int8_assert_gt(arg1, arg2) result(my_result)
         integer(i8), intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 > arg2), ">")
@@ -631,7 +660,6 @@ module fort_test
     !============================================================
     !               methods for assert_geq
     !============================================================
-
     type(Result) function int8_assert_geq(arg1, arg2) result(my_result)
         integer(i8), intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 >= arg2), ">=")
@@ -670,7 +698,6 @@ module fort_test
     !============================================================
     !               methods for assert_lt
     !============================================================
-
     type(Result) function int8_assert_lt(arg1, arg2) result(my_result)
         integer(i8), intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 < arg2), "<")
@@ -709,7 +736,6 @@ module fort_test
     !============================================================
     !               methods for assert_leq
     !============================================================
-
     type(Result) function int8_assert_leq(arg1, arg2) result(my_result)
         integer(i8), intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 <= arg2), "<=")
@@ -748,7 +774,6 @@ module fort_test
     !============================================================
     !               methods for assert_approx
     !============================================================
-
     type(Result) function real32_assert_approx(arg1, arg2, rtol, atol) result(my_result)
         real(f32), intent(in):: arg1, arg2
         real(f32), optional:: rtol, atol
@@ -797,6 +822,9 @@ module fort_test
         my_result = build_assertion(to_string(arg1), to_string(arg2), passed, "~=")
     end function
 
+    !============================================================
+    !       functions for printing and styling test results
+    !============================================================
     subroutine print_result_msg(my_result, test_number)
         type(Result), intent(in)::my_result
         integer, intent(in):: test_number
@@ -834,17 +862,14 @@ module fort_test
 
     function num_digits(i) result(n)
         integer(i32):: i, n
-
         if ( i == 0 ) then
             n = 1
         else
             n = floor(log10(1.0 * i))
         endif
-
     end function num_digits
 
     subroutine print_header(column_widths)
-
         integer(i32):: column_widths(4)
         character(len = :), allocatable:: passed_str, failed_str, total_str
         character(len = :), allocatable:: summary_str
@@ -864,7 +889,6 @@ module fort_test
             style_text(total_str,   fg_color=FG_COLOR_TOTAL,   bg_color=BG_COLOR_HEADER)
 
     end subroutine print_header
-
 
     subroutine print_testset_results(my_testset, column_widths)
         type(TestSet), intent(in) :: my_testset
@@ -905,63 +929,6 @@ module fort_test
         end do
 
     end subroutine print_testset_results
-
-    function run_all(testsets) result(num_failed)
-        type(TestSet), dimension(:):: testsets
-        integer(i32):: i, num_failed
-        integer(i32):: column_widths(4)
-        integer(i32):: num_pass, num_fail, num_total
-        character(len = 4):: number_string
-
-        ! Initialize column widths o that they can contain the header text
-        column_widths(1) = len(HEADER_SUMMARY)
-        column_widths(2) = len(HEADER_PASS)
-        column_widths(3) = len(HEADER_FAIL)
-        column_widths(4) = len(HEADER_TOTAL)
-
-        ! Get testset dimensions for printing
-        do i = 1, size(testsets)
-            num_pass  = testsets(i)%num_passed
-            num_fail  = testsets(i)%num_failed
-            num_total = num_pass + num_fail
-
-            ! Give proper name to test set if it doesn't have one
-            if (testsets(i)%name == 'noname') then
-                write(number_string, '(I4)') i
-                testsets(i)%name = "Test Set "// trim(adjustl(number_string))
-            end if
-
-            column_widths(1) = max(column_widths(1), len(testsets(i)%name))
-            column_widths(2) = max(column_widths(2), num_digits(num_pass))
-            column_widths(3) = max(column_widths(3), num_digits(num_fail))
-            column_widths(4) = max(column_widths(4), num_digits(num_total))
-        end do
-
-        ! Add one to each column width for spacing
-        column_widths = column_widths + 1
-
-        ! Print the header
-        call print_header(column_widths)
-
-        ! Print results of each testset
-        num_failed = 0
-        do i = 1, size(testsets)
-            call print_testset_results(testsets(i), column_widths)
-            num_failed = num_failed + testsets(i)%num_failed
-        end do
-
-    end function
-
-    subroutine run_and_exit(testsets)
-        type(TestSet), dimension(:), intent(in):: testsets
-        integer(i32):: num_failed
-        num_failed = run_all(testsets)
-        if (num_failed > 0) then
-            call exit(1)
-        else
-            call exit(0)
-        endif
-    end subroutine
 
     function get_color_code(color_str, type) result (color_code)
 
@@ -1036,7 +1003,6 @@ module fort_test
         case default
             color_code = ""
         end select
-
     end function get_color_code
 
     function style_text(str, fg_color, bg_color, style) result(styled)
