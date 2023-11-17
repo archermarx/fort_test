@@ -15,6 +15,8 @@ program runtests
 
     logical_tests = new_testset(    &
         (/  &
+            assert(logical_to_int(.true.) == 1), &
+            assert(logical_to_int(.false.) == 0), &
             assert(.true.) ,    &
             assert_eq((2 + 2 == 4), (4 + 4 == 8)), &
             assert_neq((2 + 2 == 4), (4 + 3 == 8)) &
