@@ -14,9 +14,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - run: sudo apt-get install gfortran
-    - run: make
-    - run: ./runtests
-    - run: gcov -pb runtests-fort_test.gcno
+    - name: Install dependencies
+      run: sudo apt-get install gfortran
 
-    - uses: codecov/codecov-action@v3
+    - name: Build
+      run: make
+
+    - name: Run tests
+      run: ./runtests
+
+    - name: Generate coverage reports
+      run: gcov -pb *-fort_test.*
+
+    - name: Upload coverage reports to CodeCov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

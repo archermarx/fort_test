@@ -23,7 +23,8 @@ module fort_test
     private
 
     public:: TestSet, Result, new_testset, run_all, run_and_exit, &
-             assert, assert_eq, assert_neq, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx
+             assert, assert_eq, assert_neq, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx, &
+             style_text, get_color_code, logical_to_int
 
     type Result
         character(len = :), allocatable:: assertion
@@ -235,15 +236,20 @@ module fort_test
 
     end function
 
+    pure integer(i32) function logical_to_int(log) result(int)
+        logical, intent(in):: log
+        if (log) then
+            int = 1
+        else
+            int = 0
+        endif
+    end function
+
     subroutine run_and_exit(testsets)
         type(TestSet), dimension(:), intent(in):: testsets
         integer(i32):: num_failed
         num_failed = run_all(testsets)
-        if (num_failed > 0) then
-            call exit(1)
-        else
-            call exit(0)
-        endif
+        call exit(logical_to_int(num_failed /= 0))
     end subroutine
 
     !============================================================
@@ -1101,4 +1107,4 @@ module fort_test
 
     end function
 
-end module fort_test
+end module

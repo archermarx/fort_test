@@ -15,6 +15,8 @@ program runtests
 
     logical_tests = new_testset(    &
         (/  &
+            assert(logical_to_int(.true.) == 1), &
+            assert(logical_to_int(.false.) == 0), &
             assert(.true.) ,    &
             assert_eq((2 + 2 == 4), (4 + 4 == 8)), &
             assert_neq((2 + 2 == 4), (4 + 3 == 8)) &
@@ -77,7 +79,7 @@ program runtests
 
             assert_gt(20.0_real32, 10.0_real32),  &
             assert_gt(20.0_real64, 10.0_real64),  &
-            !assert_gt(20.0_real128, 10.0_real128),  &
+            assert_gt(20.0_real128, 10.0_real128),  &
 
             assert_geq(20.0_real32, 10.0_real32), &
             assert_geq(20.0_real32, 20.0_real32), &
@@ -99,7 +101,14 @@ program runtests
 
             assert_approx(1.0_real32, 1.0_real32 + 10 * epsilon(1.0_real32)),   &
             assert_approx(1.0_real64, 1.0_real64 + 10 * epsilon(1.0_real64)),   &
-            assert_approx(1.0_real128, 1.0_real128 + 10 * epsilon(1.0_real128))   &
+            assert_approx(1.0_real128, 1.0_real128 + 10 * epsilon(1.0_real128)),   &
+
+            assert_approx(1.0_real32, 1.0_real32 + 10 * epsilon(1.0_real32), &
+                atol = 0.0_real32, rtol = sqrt(epsilon(1.0_real32))),       &
+            assert_approx(1.0_real64, 1.0_real64 + 10 * epsilon(1.0_real64), &
+                atol = 0.0_real64, rtol = sqrt(epsilon(1.0_real64))),       &
+            assert_approx(1.0_real128, 1.0_real128 + 10 * epsilon(1.0_real128), &
+                atol = 0.0_real128, rtol = sqrt(epsilon(1.0_real128)))   &
         /),  &
         name = "Real tests"      &
     )
@@ -170,6 +179,24 @@ program runtests
         write(error_unit, *) "Not all expected failures failed"
         call exit(1)
     endif
+
+    ! text styling
+    print*, style_text("test", bg_color = "black", style = "hidden")
+    print*, style_text("test", bg_color = "white", style = "underline")
+    print*, style_text("test", bg_color = "green", style = "strike")
+    print*, style_text("test", bg_color = "light yellow", style = "italic")
+    print*, style_text("test", bg_color = "gray", style = "dim")
+    print*, style_text("test", bg_color = "light green", style = "blink")
+    print*, style_text("test", bg_color = "light pink", style = "fast blink")
+    print*, style_text("test", bg_color = "yellow", style = "invert")
+    print*, style_text("test", bg_color = "blue", style = "circle")
+    print*, style_text("test", bg_color = "aqua", style = "frame")
+    print*, style_text("test", bg_color = "purple", style = "overline")
+    print*, style_text("test", bg_color = "white", style = "overline")
+    print*, style_text("test", bg_color = "pink", style = "bold")
+    print*, style_text("test", bg_color = "peach", style = "bold")
+    print*, style_text("test", bg_color = "light blue", style = "bold")
+    print*, get_color_code("blue", "none")
 
     write(*, *) NEW_LINE('a')//"Running actual tests..."
     call run_and_exit(tests)
