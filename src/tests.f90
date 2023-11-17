@@ -191,6 +191,10 @@ program runtests
     print*, style_text("test", bg_color = "aqua", style = "frame")
     print*, style_text("test", bg_color = "purple", style = "overline")
     print*, style_text("test", bg_color = "white", style = "overline")
+    print*, style_text("test", bg_color = "pink", style = "bold")
+    print*, style_text("test", bg_color = "peach", style = "bold")
+    print*, style_text("test", bg_color = "light blue", style = "bold")
+    print*, get_color_code("blue", "none")
 
     write(*, *) NEW_LINE('a')//"Running actual tests..."
     call run_and_exit(tests)

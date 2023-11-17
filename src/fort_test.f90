@@ -24,7 +24,7 @@ module fort_test
 
     public:: TestSet, Result, new_testset, run_all, run_and_exit, &
              assert, assert_eq, assert_neq, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx, &
-             style_text
+             style_text, get_color_code
 
     type Result
         character(len = :), allocatable:: assertion
