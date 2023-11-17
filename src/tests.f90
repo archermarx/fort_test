@@ -3,7 +3,7 @@
 ! Published with the GPL license
 
 program runtests
-     
+
     use fort_test
     use iso_fortran_env
 
@@ -21,7 +21,7 @@ program runtests
         /), &
         name = "Logical type tests" &
     )
-    
+
     integer_tests = new_testset(    &
         (/ &
             assert_eq(10_int32, 10_int32),      &
@@ -102,7 +102,7 @@ program runtests
         name = "String tests"   &
     )
 
-    tests = (/ logical_tests, integer_tests, real_tests, string_tests /)
+    tests = (/ logical_tests, integer_tests, real_tests, string_tests/)
 
     failure_tests = new_testset(    &
         (/  &
@@ -124,7 +124,7 @@ program runtests
 
     write(*, *) "Running expected failures..."
     num_failed = run_all((/failure_tests, new_testset((/assert_eq(2, 3)/))/))
-    
+
     if (num_failed .ne. size(failure_tests%test_list) + 1) then
         write(error_unit, *) "Not all expected failures failed"
         call exit(1)

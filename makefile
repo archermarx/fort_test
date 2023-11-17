@@ -10,11 +10,11 @@ DOCS_DIR = docs
 TEST_FILES = $(SOURCE_DIR)/fort_test.f90
 TEST_MAIN = $(SOURCE_DIR)/tests.f90
 
-all: 
+all:
 	make test
-default: 
+default:
 	make test
-test: 
+test:
 	$(FC) $(TEST_FLAGS) -o $(TEST_PROGRAM) $(TEST_FILES) $(TEST_MAIN)
 clean:
 	rm -rf *.mod *.o $(EXECUTABLES) *.gcda *.gcno
