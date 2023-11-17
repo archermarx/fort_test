@@ -17,5 +17,6 @@ jobs:
     - run: sudo apt-get install gfortran
     - run: make
     - run: ./runtests
+    - run: gcov -pb runtests-fort_test.gcno
 
     - uses: codecov/codecov-action@v3
