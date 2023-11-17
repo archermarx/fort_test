@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/archermarx/fort_test.svg?branch=master)](https://travis-ci.com/archermarx/fort_test) 
+![Tests](https://github.com/archermarx/fort-test/actions/workflows/tests.yml/badge.svg)
 [![codecov](https://codecov.io/gh/archermarx/fort_test/branch/master/graph/badge.svg)](https://codecov.io/gh/archermarx/fort_test)
 
 # fort_test
