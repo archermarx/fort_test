@@ -1,6 +1,6 @@
 FC = gfortran
 TEST_PROGRAM = runtests
-TEST_FLAGS = --coverage -O0
+TEST_FLAGS = --coverage -O0 -g
 
 EXECUTABLES = $(TEST_PROGRAM) $(PROGRAM)
 SOURCE_DIR = src

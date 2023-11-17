@@ -11,7 +11,6 @@
 !!  * Look into preprocessor macros to print lines of source code
 !!  * Make little example project based on tutorial
 !!  * More types
-!!       * Array
 !!       * Real128
 !!       * Complex
 !!       * int8, int16
@@ -21,8 +20,11 @@ module fort_test
         stderr => error_unit, &
         stdin => input_unit, &
         stdout => output_unit, &
-        f32 => real32, &
-        f64 => real64, &
+        f32  => real32, &
+        f64  => real64, &
+        f128 => real128, &
+        i8  => int8, &
+        i16 => int16, &
         i32 => int32, &
         i64 => int64
 
@@ -30,8 +32,8 @@ module fort_test
 
     private
 
-    public::    TestSet, Result, new_testset, run_all, assert_eq, assert_neq, assert_positive, &
-                assert_negative, assert_gt, assert_geq, assert_lt, assert_leq, assert_approx, assert, &
+    public::    TestSet, Result, new_testset, run_all, assert_eq, assert_neq, &
+                assert_gt, assert_geq, assert_lt, assert_leq, assert_approx, assert, &
                 run_and_exit
 
     type Result
@@ -58,69 +60,164 @@ module fort_test
 
     character(len = *), parameter:: FLOAT_FORMAT = '(g0)'
 
+    !> Convert the argument to a string
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @return Result
     interface to_string
         module procedure logical_to_string, logical_arr_to_string
+        module procedure int8_to_string, int8_arr_to_string
+        module procedure int16_to_string, int16_arr_to_string
         module procedure int32_to_string, int32_arr_to_string
         module procedure int64_to_string, int64_arr_to_string
         module procedure real32_to_string, real32_arr_to_string
         module procedure real64_to_string, real64_arr_to_string
+        module procedure real128_to_string, real128_arr_to_string
     end interface
 
     !> Test whether two things are equal
     !! @param[in] arg1
-    !! @param[out] arg2
+    !! @param[in] arg2
     !! @return Result
     interface assert_eq
+        module procedure int8_assert_eq, int8_arr_assert_eq
+        module procedure int16_assert_eq, int16_arr_assert_eq
         module procedure int32_assert_eq, int32_arr_assert_eq
         module procedure int64_assert_eq, int64_arr_assert_eq
         module procedure real32_assert_eq, real32_arr_assert_eq
         module procedure real64_assert_eq, real64_arr_assert_eq
+        module procedure real128_assert_eq, real128_arr_assert_eq
         module procedure logical_assert_eq, logical_arr_assert_eq
         module procedure string_assert_eq
     end interface
 
+    !> Test whether two things are  not equal
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @return Result
     interface assert_neq
-        procedure   int32_assert_neq, int64_assert_neq, &
-                    real32_assert_neq, real64_assert_neq, &
-                    logical_assert_neq, string_assert_neq
+        module procedure int8_assert_neq, int8_arr_assert_neq
+        module procedure int16_assert_neq, int16_arr_assert_neq
+        module procedure int32_assert_neq, int32_arr_assert_neq
+        module procedure int64_assert_neq, int64_arr_assert_neq
+        module procedure real32_assert_neq, real32_arr_assert_neq
+        module procedure real64_assert_neq, real64_arr_assert_neq
+        module procedure real128_assert_neq, real128_arr_assert_neq
+        module procedure logical_assert_neq, logical_arr_assert_neq
+        module procedure string_assert_neq
     end interface
 
-    interface assert_positive
-        procedure   int32_assert_positive, int64_assert_positive, &
-                    real32_assert_positive, real64_assert_positive
-    end interface
-
-    interface assert_negative
-        procedure   int32_assert_negative, int64_assert_negative, &
-                    real32_assert_negative, real64_assert_negative
-    end interface
-
+    !> Test whether arg1 >= arg2
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @return Result
     interface assert_geq
-        procedure   int32_assert_geq, int64_assert_geq, &
-                    real32_assert_geq, real64_assert_geq
+        procedure   int8_assert_geq, int16_assert_geq, &
+                    int32_assert_geq, int64_assert_geq, &
+                    real32_assert_geq, real64_assert_geq, real128_assert_geq
     end interface
 
+    !> Test whether arg1 <= arg2
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @return Result
     interface assert_leq
-        procedure   int32_assert_leq, int64_assert_leq, &
-                    real32_assert_leq, real64_assert_leq
+        procedure   int8_assert_leq, int16_assert_leq, &
+                    int32_assert_leq, int64_assert_leq, &
+                    real32_assert_leq, real64_assert_leq, real128_assert_leq
     end interface
 
+    !> Test whether arg1 > arg2
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @return Result
     interface assert_gt
-        procedure   int32_assert_gt, int64_assert_gt, &
-                    real32_assert_gt, real64_assert_gt
+        procedure   int8_assert_gt, int16_assert_gt, &
+                    int32_assert_gt, int64_assert_gt, &
+                    real32_assert_gt, real64_assert_gt, real128_assert_gt
     end interface
 
+    !> Test whether arg1 < arg2
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @return Result
     interface assert_lt
-        procedure   int32_assert_lt, int64_assert_lt, &
-                    real32_assert_lt, real64_assert_lt
+        procedure   int8_assert_lt, int16_assert_lt, &
+                    int32_assert_lt, int64_assert_lt, &
+                    real32_assert_lt, real64_assert_lt, real128_assert_lt
     end interface
 
+    !> Test whether arg1 ~= arg2
+    !! @param[in] arg1
+    !! @param[in] arg2
+    !! @param[in] atol
+    !! @param[in] rol
+    !! @return Result
     interface assert_approx
-        procedure real32_assert_approx, real64_assert_approx
+        procedure real32_assert_approx, real64_assert_approx, real128_assert_approx
     end interface assert_approx
 
     contains
 
+    !============================================================
+    !               testset construction
+    !============================================================
+
+    function new_testset(test_list, name) result(my_testset)
+        type(TestSet):: my_testset
+        character(len = *), optional:: name
+        character(len = :), allocatable::testset_name
+        type(Result), dimension(:), intent(in):: test_list
+        integer:: i, num_tests
+
+        if (present(name)) then
+            testset_name = name
+        else
+            testset_name = "noname"
+        endif
+
+        my_testset%name = testset_name
+        my_testset%test_list = test_list
+        my_testset%num_passed = 0
+        my_testset%num_failed = 0
+
+        num_tests = size(my_testset%test_list)
+
+        ! TODO: Move this into testset constructor
+        do i = 1, num_tests
+            if (my_testset%test_list(i)%passed) then
+                my_testset%num_passed = my_testset%num_passed + 1
+            else
+                my_testset%num_failed = my_testset%num_failed + 1
+            endif
+        end do
+    end function
+
+    function assert(bool) result(my_result)
+        logical, intent(in):: bool
+        type(Result):: my_result
+
+        if (bool) then
+            my_result%assertion = "true"
+        else
+            my_result%assertion = "false"
+        endif
+
+        my_result%passed = bool
+    end function
+
+    function build_assertion(arg1_str, arg2_str, passed, comparision) result(my_result)
+        character(len = *):: arg1_str, arg2_str, comparision
+        type(Result):: my_result
+        logical:: passed
+
+        my_result%assertion = trim(adjustl(arg1_str))//" "//comparision//" "//trim(adjustl(arg2_str))
+        my_result%passed = passed
+    end function build_assertion
+
+    !============================================================
+    !               methods for to_string
+    !============================================================
     pure function logical_to_string(val) result(str)
         logical, intent(in):: val
         character(len = :), allocatable:: str
@@ -133,6 +230,46 @@ module fort_test
 
     pure function logical_arr_to_string(arr) result(str)
         logical, intent(in):: arr(:)
+        character(len = :), allocatable:: str
+        integer(i32):: i
+        str = "["
+        do i = 1, size(arr)
+            str = str // trim(adjustl(to_string(arr(i))))
+            if (i < size(arr)) str = str // ", "
+        end do
+        str = str // "]"
+    end function
+
+    pure function int8_to_string(val) result(str)
+        integer(i8), intent(in):: val
+        character(len = 20):: str_intermediate
+        character(len = :), allocatable:: str
+        write(str_intermediate, '(g0)') val
+        str = trim(adjustl(str_intermediate))
+    end function
+
+    pure function int8_arr_to_string(arr) result(str)
+        integer(i8), intent(in):: arr(:)
+        character(len = :), allocatable:: str
+        integer(i32):: i
+        str = "["
+        do i = 1, size(arr)
+            str = str // trim(adjustl(to_string(arr(i))))
+            if (i < size(arr)) str = str // ", "
+        end do
+        str = str // "]"
+    end function
+
+    pure function int16_to_string(val) result(str)
+        integer(i16), intent(in):: val
+        character(len = 20):: str_intermediate
+        character(len = :), allocatable:: str
+        write(str_intermediate, '(g0)') val
+        str = trim(adjustl(str_intermediate))
+    end function
+
+    pure function int16_arr_to_string(arr) result(str)
+        integer(i16), intent(in):: arr(:)
         character(len = :), allocatable:: str
         integer(i32):: i
         str = "["
@@ -223,49 +360,29 @@ module fort_test
         str = str // "]"
     end function
 
-    function new_testset(test_list, name) result(my_testset)
-        type(TestSet):: my_testset
-        character(len = *), optional:: name
-        character(len = :), allocatable::testset_name
-        type(Result), dimension(:), intent(in):: test_list
-        integer:: i, num_tests
+    pure function real128_to_string(val) result(str)
+        real(f128), intent(in):: val
+        character(len = 64):: str_intermediate
+        character(len = :), allocatable:: str
+        write(str_intermediate, FLOAT_FORMAT) val
+        str = trim(adjustl(str_intermediate))
+    end function
 
-        if (present(name)) then
-            testset_name = name
-        else
-            testset_name = "noname"
-        endif
-
-        my_testset%name = testset_name
-        my_testset%test_list = test_list
-        my_testset%num_passed = 0
-        my_testset%num_failed = 0
-
-        num_tests = size(my_testset%test_list)
-
-        ! TODO: Move this into testset constructor
-        do i = 1, num_tests
-            if (my_testset%test_list(i)%passed) then
-                my_testset%num_passed = my_testset%num_passed + 1
-            else
-                my_testset%num_failed = my_testset%num_failed + 1
-            endif
+    pure function real128_arr_to_string(arr) result(str)
+        real(f128), intent(in):: arr(:)
+        character(len = :), allocatable:: str
+        integer(i32):: i
+        str = "["
+        do i = 1, size(arr)
+            str = str // trim(adjustl(to_string(arr(i))))
+            if (i < size(arr)) str = str // ", "
         end do
+        str = str // "]"
     end function
 
-    function assert(bool) result(my_result)
-        logical, intent(in):: bool
-        type(Result):: my_result
-
-        if (bool) then
-            my_result%assertion = "true"
-        else
-            my_result%assertion = "false"
-        endif
-
-        my_result%passed = bool
-    end function
-
+    !============================================================
+    !               methods for assert_eq
+    !============================================================
     type(Result) function logical_assert_eq(arg1, arg2) result(my_result)
         logical, intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 .eqv. arg2), "==")
@@ -275,6 +392,30 @@ module fort_test
         logical, intent(in):: arg1(:), arg2(:)
         logical:: assertion_result
         assertion_result = size(arg1) == size(arg2) .and. all(arg1 .eqv. arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "==")
+    end function
+
+    type(Result) function int8_assert_eq(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 == arg2), "==")
+    end function
+
+    type(Result) function int8_arr_assert_eq(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) == size(arg2) .and. all(arg1 == arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "==")
+    end function
+
+    type(Result) function int16_assert_eq(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 == arg2), "==")
+    end function
+
+    type(Result) function int16_arr_assert_eq(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) == size(arg2) .and. all(arg1 == arg2)
         my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "==")
     end function
 
@@ -326,14 +467,61 @@ module fort_test
         my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "==")
     end function
 
+    type(Result) function real128_assert_eq(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 == arg2), "==")
+    end function
+
+    type(Result) function real128_arr_assert_eq(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) == size(arg2) .and. all(arg1 == arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "==")
+    end function
+
     type(Result) function string_assert_eq(arg1, arg2) result(my_result)
         character(len = *), intent(in):: arg1, arg2
         my_result = build_assertion(arg1, arg2, arg1 == arg2, "==")
     end function
 
+    !============================================================
+    !               methods for assert_neq
+    !============================================================
+
     type(Result) function logical_assert_neq(arg1, arg2) result(my_result)
         logical, intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 .neqv. arg2), "!=")
+    end function
+
+    type(Result) function logical_arr_assert_neq(arg1, arg2) result(my_result)
+        logical, intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or. any(arg1 .neqv. arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
+    end function
+
+    type(Result) function int8_assert_neq(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
+    end function
+
+    type(Result) function int8_arr_assert_neq(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or.any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
+    end function
+
+    type(Result) function int16_assert_neq(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
+    end function
+
+    type(Result) function int16_arr_assert_neq(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or.any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
     end function
 
     type(Result) function int32_assert_neq(arg1, arg2) result(my_result)
@@ -341,9 +529,23 @@ module fort_test
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
     end function
 
+    type(Result) function int32_arr_assert_neq(arg1, arg2) result(my_result)
+        integer(i32), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or.any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
+    end function
+
     type(Result) function int64_assert_neq(arg1, arg2) result(my_result)
         integer(i64), intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
+    end function
+
+    type(Result) function int64_arr_assert_neq(arg1, arg2) result(my_result)
+        integer(i64), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or. any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
     end function
 
     type(Result) function real32_assert_neq(arg1, arg2) result(my_result)
@@ -351,9 +553,35 @@ module fort_test
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
     end function
 
+    type(Result) function real32_arr_assert_neq(arg1, arg2) result(my_result)
+        real(f32), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or. any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
+    end function
+
     type(Result) function real64_assert_neq(arg1, arg2) result(my_result)
         real(f64), intent(in):: arg1, arg2
         my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
+    end function
+
+    type(Result) function real64_arr_assert_neq(arg1, arg2) result(my_result)
+        real(f64), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or. any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
+    end function
+
+    type(Result) function real128_assert_neq(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 /= arg2), "!=")
+    end function
+
+    type(Result) function real128_arr_assert_neq(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1(:), arg2(:)
+        logical:: assertion_result
+        assertion_result = size(arg1) /= size(arg2) .or. any(arg1 /= arg2)
+        my_result = build_assertion(to_string(arg1), to_string(arg2), assertion_result, "!=")
     end function
 
     type(Result) function string_assert_neq(arg1, arg2) result(my_result)
@@ -361,92 +589,30 @@ module fort_test
         my_result = build_assertion(arg1, arg2, arg1 /= arg2, "!=")
     end function
 
-    function int32_assert_positive(arg1) result(my_result)
-        integer(i32), intent(in):: arg1
+    !============================================================
+    !               methods for assert_gt
+    !============================================================
+
+    function int8_assert_gt(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1, arg2
         type(Result):: my_result
-        character(len = 32):: arg1_str
+        character(len = 32):: arg1_str, arg2_str
 
         write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
 
-        my_result%assertion = trim(adjustl(arg1_str))//" is positive"
-        my_result%passed = (arg1 > 0)
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 > arg2), ">")
     end function
 
-    function int64_assert_positive(arg1) result(my_result)
-        integer(i64), intent(in):: arg1
+    function int16_assert_gt(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1, arg2
         type(Result):: my_result
-        character(len = 32):: arg1_str
-
-        write(arg1_str, '(I8)') arg1
-
-        my_result%assertion = trim(adjustl(arg1_str))//" is positive"
-        my_result%passed = (arg1 > 0)
-    end function
-
-    function real32_assert_positive(arg1) result(my_result)
-        real(f32), intent(in):: arg1
-        type(Result):: my_result
-        character(len = 32):: arg1_str
-
-        write(arg1_str, FLOAT_FORMAT) arg1
-
-        my_result%assertion = trim(adjustl(arg1_str))//" is positive"
-        my_result%passed = (arg1 > 0)
-    end function
-
-    function real64_assert_positive(arg1) result(my_result)
-        real(f64), intent(in):: arg1
-        type(Result):: my_result
-        character(len = 32):: arg1_str
-
-        write(arg1_str, FLOAT_FORMAT) arg1
-
-        my_result%assertion = trim(adjustl(arg1_str))//" is positive"
-        my_result%passed = (arg1 > 0)
-    end function
-
-    function int32_assert_negative(arg1) result(my_result)
-        integer(i32), intent(in):: arg1
-        type(Result):: my_result
-        character(len = 32):: arg1_str
+        character(len = 32):: arg1_str, arg2_str
 
         write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
 
-        my_result%assertion = trim(adjustl(arg1_str))//" is negative"
-        my_result%passed = (arg1 < 0)
-    end function
-
-    function int64_assert_negative(arg1) result(my_result)
-        integer(i64), intent(in):: arg1
-        type(Result):: my_result
-        character(len = 32):: arg1_str
-
-        write(arg1_str, '(I8)') arg1
-
-        my_result%assertion = trim(adjustl(arg1_str))//" is negative"
-        my_result%passed = (arg1 < 0)
-    end function
-
-    function real32_assert_negative(arg1) result(my_result)
-        real(f32), intent(in):: arg1
-        type(Result):: my_result
-        character(len = 32):: arg1_str
-
-        write(arg1_str, FLOAT_FORMAT) arg1
-
-        my_result%assertion = trim(adjustl(arg1_str))//" is negative"
-        my_result%passed = (arg1 < 0)
-    end function
-
-    function real64_assert_negative(arg1) result(my_result)
-        real(f64), intent(in):: arg1
-        type(Result):: my_result
-        character(len = 32):: arg1_str
-
-        write(arg1_str, FLOAT_FORMAT) arg1
-
-        my_result%assertion = trim(adjustl(arg1_str))//" is negative"
-        my_result%passed = (arg1 < 0)
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 > arg2), ">")
     end function
 
     function int32_assert_gt(arg1, arg2) result(my_result)
@@ -482,15 +648,40 @@ module fort_test
         my_result = build_assertion(arg1_str, arg2_str, (arg1 > arg2), ">")
     end function
 
-    function real64_assert_gt(arg1, arg2) result(my_result)
+    type(Result) function real64_assert_gt(arg1, arg2) result(my_result)
         real(f64), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 > arg2), ">")
+    end function
+
+    type(Result) function real128_assert_gt(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        my_result = build_assertion(to_string(arg1), to_string(arg2), (arg1 > arg2), ">")
+    end function
+
+    !============================================================
+    !               methods for assert_geq
+    !============================================================
+
+    function int8_assert_geq(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1, arg2
         type(Result):: my_result
         character(len = 32):: arg1_str, arg2_str
 
-        write(arg1_str, FLOAT_FORMAT) arg1
-        write(arg2_str, FLOAT_FORMAT) arg2
+        write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
 
-        my_result = build_assertion(arg1_str, arg2_str, (arg1 > arg2), ">")
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 >= arg2), ">=")
+    end function
+
+    function int16_assert_geq(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 32):: arg1_str, arg2_str
+
+        write(arg1_str, '(I8)') arg1
+        write(arg2_str, '(I8)') arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 >= arg2), ">=")
     end function
 
     function int32_assert_geq(arg1, arg2) result(my_result)
@@ -537,6 +728,43 @@ module fort_test
         my_result = build_assertion(arg1_str, arg2_str, (arg1 >= arg2), ">=")
     end function
 
+    function real128_assert_geq(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 128):: arg1_str, arg2_str
+
+        write(arg1_str, FLOAT_FORMAT) arg1
+        write(arg2_str, FLOAT_FORMAT) arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 >= arg2), ">=")
+    end function
+
+    !============================================================
+    !               methods for assert_lt
+    !============================================================
+
+    function int8_assert_lt(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 32):: arg1_str, arg2_str
+
+        write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 < arg2), "<")
+    end function
+
+    function int16_assert_lt(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 32):: arg1_str, arg2_str
+
+        write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 < arg2), "<")
+    end function
+
     function int32_assert_lt(arg1, arg2) result(my_result)
         integer(i32), intent(in):: arg1, arg2
         type(Result):: my_result
@@ -579,6 +807,43 @@ module fort_test
         write(arg2_str, FLOAT_FORMAT) arg2
 
         my_result = build_assertion(arg1_str, arg2_str, (arg1 < arg2), "<")
+    end function
+
+    function real128_assert_lt(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 128):: arg1_str, arg2_str
+
+        write(arg1_str, FLOAT_FORMAT) arg1
+        write(arg2_str, FLOAT_FORMAT) arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 < arg2), "<")
+    end function
+
+    !============================================================
+    !               methods for assert_leq
+    !============================================================
+
+    function int8_assert_leq(arg1, arg2) result(my_result)
+        integer(i8), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 32):: arg1_str, arg2_str
+
+        write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 <= arg2), "<=")
+    end function
+
+    function int16_assert_leq(arg1, arg2) result(my_result)
+        integer(i16), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 32):: arg1_str, arg2_str
+
+        write(arg1_str, '(I4)') arg1
+        write(arg2_str, '(I4)') arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 <= arg2), "<=")
     end function
 
     function int32_assert_leq(arg1, arg2) result(my_result)
@@ -625,16 +890,31 @@ module fort_test
         my_result = build_assertion(arg1_str, arg2_str, (arg1 <= arg2), "<=")
     end function
 
+    function real128_assert_leq(arg1, arg2) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        type(Result):: my_result
+        character(len = 64):: arg1_str, arg2_str
+
+        write(arg1_str, FLOAT_FORMAT) arg1
+        write(arg2_str, FLOAT_FORMAT) arg2
+
+        my_result = build_assertion(arg1_str, arg2_str, (arg1 <= arg2), "<=")
+    end function
+
+    !============================================================
+    !               methods for assert_approx
+    !============================================================
+
     function real32_assert_approx(arg1, arg2, rtol, atol) result(my_result)
-        real, intent(in):: arg1, arg2
-        real, optional:: rtol, atol
-        real:: relative_tolerance, absolute_tolerance
+        real(f32), intent(in):: arg1, arg2
+        real(f32), optional:: rtol, atol
+        real(f32):: relative_tolerance, absolute_tolerance
         type(Result):: my_result
         character(len = 32):: arg1_str, arg2_str
         logical:: passed
 
         relative_tolerance = sqrt(EPSILON(arg1))
-        absolute_tolerance = 0.0d0
+        absolute_tolerance = 0.0_f32
 
         if (present(rtol)) relative_tolerance = rtol
 
@@ -646,7 +926,7 @@ module fort_test
         passed = (abs(arg1 - arg2) <= (absolute_tolerance + relative_tolerance*max(abs(arg1), abs(arg2))))
 
         my_result = build_assertion(arg1_str, arg2_str, passed, "~=")
-    end function real32_assert_approx
+    end function
 
     function real64_assert_approx(arg1, arg2, rtol, atol) result(my_result)
         real(f64), intent(in):: arg1, arg2
@@ -657,7 +937,7 @@ module fort_test
         logical:: passed
 
         relative_tolerance = sqrt(EPSILON(arg1))
-        absolute_tolerance = 0.0d0
+        absolute_tolerance = 0.0_f64
 
         if (present(rtol)) relative_tolerance = rtol
 
@@ -669,16 +949,31 @@ module fort_test
         passed = (abs(arg1 - arg2) <= (absolute_tolerance + relative_tolerance * max(abs(arg1), abs(arg2))))
 
         my_result = build_assertion(arg1_str, arg2_str, passed, "~=")
-    end function real64_assert_approx
+    end function
 
-    function build_assertion(arg1_str, arg2_str, passed, comparision) result(my_result)
-        character(len = *):: arg1_str, arg2_str, comparision
+    function real128_assert_approx(arg1, arg2, rtol, atol) result(my_result)
+        real(f128), intent(in):: arg1, arg2
+        real(f128), optional:: rtol, atol
+        real(f128):: relative_tolerance, absolute_tolerance
         type(Result):: my_result
+        character(len = 64):: arg1_str, arg2_str
         logical:: passed
 
-        my_result%assertion = trim(adjustl(arg1_str))//" "//comparision//" "//trim(adjustl(arg2_str))
-        my_result%passed = passed
-    end function build_assertion
+        relative_tolerance = sqrt(EPSILON(arg1))
+        absolute_tolerance = 0.0_f64
+
+        if (present(rtol)) relative_tolerance = rtol
+
+        if (present(atol)) absolute_tolerance = atol
+
+        write(arg1_str, FLOAT_FORMAT) arg1
+        write(arg2_str, FLOAT_FORMAT) arg2
+
+        passed = (abs(arg1 - arg2) <= (absolute_tolerance + relative_tolerance * max(abs(arg1), abs(arg2))))
+
+        my_result = build_assertion(arg1_str, arg2_str, passed, "~=")
+    end function
+
 
     subroutine print_result_msg(my_result, test_number)
         type(Result), intent(in)::my_result
@@ -778,7 +1073,7 @@ module fort_test
 
         write(stdout, '(A)') name_str // '|' // &
                 style_text(adjustr(num_passed_str), fg_color = FG_COLOR_PASS)//&
-                style_text(num_failed_str, fg_color = FG_COLOR_FAIL)//&
+                style_text(adjustr(num_failed_str), fg_color = FG_COLOR_FAIL)//&
                 style_text(adjustr(num_total_str), fg_color = FG_COLOR_TOTAL)
 
         num_tests = size(my_testset%test_list)
