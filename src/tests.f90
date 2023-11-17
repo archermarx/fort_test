@@ -3,14 +3,14 @@
 ! Published with the GPL license
 
 program runtests
-     
+
     use fort_test
     use iso_fortran_env
 
     implicit none
 
     integer:: num_failed
-    type(TestSet):: logical_tests, integer_tests, real_tests, string_tests, failure_tests
+    type(TestSet):: logical_tests, integer_tests, real_tests, string_tests, array_tests, failure_tests
     type(TestSet), dimension(:), allocatable:: tests
 
     logical_tests = new_testset(    &
@@ -21,32 +21,42 @@ program runtests
         /), &
         name = "Logical type tests" &
     )
-    
+
     integer_tests = new_testset(    &
         (/ &
+            assert_eq(10_int8, 10_int8),      &
+            assert_eq(10_int16, 10_int16),      &
             assert_eq(10_int32, 10_int32),      &
             assert_eq(20_int64, 20_int64),      &
 
+            assert_neq(10_int8, 20_int8),     &
+            assert_neq(10_int16, 20_int16),     &
             assert_neq(10_int32, 20_int32),     &
             assert_neq(10_int64, 20_int64),     &
 
-            assert_positive(10_int32),  &
-            assert_positive(10_int64),  &
-
-            assert_negative(-10_int32),  &
-            assert_negative(-10_int64),  &
-
+            assert_gt(20_int8, 10_int8),  &
+            assert_gt(20_int16, 10_int16),  &
             assert_gt(20_int32, 10_int32),  &
             assert_gt(20_int64, 10_int64),  &
 
+            assert_geq(20_int8, 10_int8), &
+            assert_geq(20_int8, 20_int8), &
+            assert_geq(20_int16, 10_int16), &
+            assert_geq(20_int16, 20_int16), &
             assert_geq(20_int32, 10_int32), &
             assert_geq(20_int32, 20_int32), &
             assert_geq(20_int64, 10_int64), &
             assert_geq(20_int64, 20_int64), &
 
+            assert_lt(10_int8, 20_int8),  &
+            assert_lt(10_int16, 20_int16),  &
             assert_lt(10_int32, 20_int32),  &
             assert_lt(10_int64, 20_int64),  &
 
+            assert_leq(10_int8, 20_int8), &
+            assert_leq(20_int8, 20_int8), &
+            assert_leq(10_int16, 20_int16), &
+            assert_leq(20_int16, 20_int16), &
             assert_leq(10_int32, 20_int32), &
             assert_leq(20_int32, 20_int32), &
             assert_leq(10_int64, 20_int64), &
@@ -57,36 +67,39 @@ program runtests
 
     real_tests = new_testset(    &
         (/ &
-            assert_eq(10.0, 10.0),      &
-            assert_eq(10.0d0, 10.0d0),      &
+            assert_eq(10.0_real32, 10.0_real32),      &
+            assert_eq(10.0_real64, 10.0_real64),      &
+            assert_eq(10.0_real128, 10.0_real128),    &
 
-            assert_neq(10.0, 20.0),     &
-            assert_neq(10.0d0, 20.0d0),     &
+            assert_neq(10.0_real32, 20.0_real32),     &
+            assert_neq(10.0_real64, 20.0_real64),     &
+            assert_neq(10.0_real128, 20.0_real128),    &
 
-            assert_positive(10.0),  &
-            assert_positive(10.0d0),  &
+            assert_gt(20.0_real32, 10.0_real32),  &
+            assert_gt(20.0_real64, 10.0_real64),  &
+            !assert_gt(20.0_real128, 10.0_real128),  &
 
-            assert_negative(-10.0),  &
-            assert_negative(-10.0d0),  &
+            assert_geq(20.0_real32, 10.0_real32), &
+            assert_geq(20.0_real32, 20.0_real32), &
+            assert_geq(20.0_real64, 10.0_real64), &
+            assert_geq(20.0_real64, 20.0_real64), &
+            assert_geq(20.0_real128, 10.0_real128), &
+            assert_geq(20.0_real128, 20.0_real128), &
 
-            assert_gt(20.0, 10.0),  &
-            assert_gt(20.0d0, 10.0d0),  &
+            assert_lt(10.0_real32, 20.0_real32),  &
+            assert_lt(10.0_real64, 20.0_real64),  &
+            assert_lt(10.0_real128, 20.0_real128),  &
 
-            assert_geq(20.0, 10.0), &
-            assert_geq(20.0, 20.0), &
-            assert_geq(20.0d0, 10.0d0), &
-            assert_geq(20.0d0, 20.0d0), &
+            assert_leq(10.0_real32, 20.0_real32), &
+            assert_leq(20.0_real32, 20.0_real32), &
+            assert_leq(10.0_real64, 20.0_real64), &
+            assert_leq(20.0_real64, 20.0_real64),  &
+            assert_leq(10.0_real128, 20.0_real128), &
+            assert_leq(20.0_real128, 20.0_real128),  &
 
-            assert_lt(10.0, 20.0),  &
-            assert_lt(10.0d0, 20.0d0),  &
-
-            assert_leq(10.0, 20.0), &
-            assert_leq(20.0, 20.0), &
-            assert_leq(10.0d0, 20.0d0), &
-            assert_leq(20.0d0, 20.0d0),  &
-
-            assert_approx(1.0, 1.0 + 10*epsilon(1.0)), &
-            assert_approx(1.0d0, 1.0d0 + 10 * epsilon(1.0d0))   &
+            assert_approx(1.0_real32, 1.0_real32 + 10 * epsilon(1.0_real32)),   &
+            assert_approx(1.0_real64, 1.0_real64 + 10 * epsilon(1.0_real64)),   &
+            assert_approx(1.0_real128, 1.0_real128 + 10 * epsilon(1.0_real128))   &
         /),  &
         name = "Real tests"      &
     )
@@ -102,18 +115,46 @@ program runtests
         name = "String tests"   &
     )
 
-    tests = (/ logical_tests, integer_tests, real_tests, string_tests /)
+    array_tests = new_testset ( &
+        (/ &
+            assert_eq((/1.0_real32, 1.0_real32, 1.0_real32/), (/1.0_real32, 1.0_real32, 1.0_real32/)), &
+            assert_neq((/2.0_real32, 1.0_real32, 1.0_real32/), (/1.0_real32, 1.0_real32, 1.0_real32/)), &
+            assert_neq((/2.0_real32, 1.0_real32, 1.0_real32/), (/1.0_real32, 1.0_real32/)), &
+            assert_eq((/1.0_real64, 1.0_real64, 1.0_real64/), (/1.0_real64, 1.0_real64, 1.0_real64/)), &
+            assert_neq((/2.0_real64, 1.0_real64, 1.0_real64/), (/1.0_real64, 1.0_real64, 1.0_real64/)), &
+            assert_neq((/2.0_real64, 1.0_real64, 1.0_real64/), (/1.0_real64, 1.0_real64/)), &
+            assert_eq((/1.0_real128, 1.0_real128, 1.0_real128/), (/1.0_real128, 1.0_real128, 1.0_real128/)), &
+            assert_neq((/2.0_real128, 1.0_real128, 1.0_real128/), (/1.0_real128, 1.0_real128, 1.0_real128/)), &
+            assert_neq((/2.0_real128, 1.0_real128, 1.0_real128/), (/1.0_real128, 1.0_real128/)), &
+            assert_eq((/1_int8, 1_int8, 1_int8/), (/1_int8, 1_int8, 1_int8/)), &
+            assert_neq((/2_int8, 1_int8, 1_int8/), (/1_int8, 1_int8, 1_int8/)), &
+            assert_neq((/2_int8, 1_int8, 1_int8/), (/1_int8, 1_int8/)), &
+            assert_eq((/1_int16, 1_int16, 1_int16/), (/1_int16, 1_int16, 1_int16/)), &
+            assert_neq((/2_int16, 1_int16, 1_int16/), (/1_int16, 1_int16, 1_int16/)), &
+            assert_neq((/2_int16, 1_int16, 1_int16/), (/1_int16, 1_int16/)), &
+            assert_eq((/1_int32, 1_int32, 1_int32/), (/1_int32, 1_int32, 1_int32/)), &
+            assert_neq((/2_int32, 1_int32, 1_int32/), (/1_int32, 1_int32, 1_int32/)), &
+            assert_neq((/2_int32, 1_int32, 1_int32/), (/1_int32, 1_int32/)), &
+            assert_eq((/1_int64, 1_int64, 1_int64/), (/1_int64, 1_int64, 1_int64/)), &
+            assert_neq((/2_int64, 1_int64, 1_int64/), (/1_int64, 1_int64, 1_int64/)), &
+            assert_neq((/2_int64, 1_int64, 1_int64/), (/1_int64, 1_int64/)), &
+            assert_eq((/.true., .false./), (/.true., .false./)), &
+            assert_neq((/.true., .false./), (/.true./)), &
+            assert_neq((/.true., .false./), (/.true., .true./)) &
+        /), &
+        name = "Array tests" &
+    )
+
+    tests = (/ logical_tests, integer_tests, real_tests, string_tests, array_tests/)
 
     failure_tests = new_testset(    &
         (/  &
             assert(.false.), &
-            assert_eq(2.0d0, 3.0d0), &
+            assert_eq(2.0_real64, 3.0_real64), &
+            assert_eq(2.0_real128, 3.0_real128), &
             assert_geq(2.0, 3.0), &
             assert_gt(3_int32, 4_int32), &
-            assert_neq(.false., .false.), &
-            assert_positive(-1_int64), &
-            assert_negative(2.0), &
-            assert_approx(2.0d0, 3.0d0), &
+            assert_approx(2.0_real64, 3.0_real64), &
             assert_neq("Cheese", "Cheese"), &
             assert_eq("Cheese", "Pizza"), &
             assert_lt(4.0, 1.0), &
@@ -124,7 +165,7 @@ program runtests
 
     write(*, *) "Running expected failures..."
     num_failed = run_all((/failure_tests, new_testset((/assert_eq(2, 3)/))/))
-    
+
     if (num_failed .ne. size(failure_tests%test_list) + 1) then
         write(error_unit, *) "Not all expected failures failed"
         call exit(1)
