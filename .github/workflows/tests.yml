@@ -1,4 +1,4 @@
-name: Makefile CI
+name: tests
 
 on:
   workflow_dispatch:
@@ -13,6 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: codecov/codecov-action@v3
 
     - run: sudo apt-get install gfortran
     - run: make
